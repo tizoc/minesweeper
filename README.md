@@ -6,7 +6,7 @@ To build:
 
 To run tests:
 
-    make test:
+    make test
 
 To run:
 
