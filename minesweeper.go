@@ -22,6 +22,9 @@ type game struct {
 }
 
 func makeGame(width, height, bombs uint) *game {
+	// TODO: limit board size
+	// check that the amount of bombs makes sense
+	// for the board size and is > 0
 	game := &game{
 		width:  width,
 		height: height,
@@ -38,10 +41,12 @@ func placeBombs(game *game) {
 	}
 }
 
+// Finds an empty cell in the game board
+// and places a bomb on it
 func placeBombAtRandom(game *game) {
-	cellsCount := game.width * game.height
+	cellsCount := int(game.width * game.height)
 	for {
-		cell := uint(rand.Intn(int(cellsCount)))
+		cell := uint(rand.Intn(cellsCount))
 		if game.board[cell] != bomb {
 			game.board[cell] = bomb
 			incrementNeighbors(game, cell)
@@ -50,6 +55,8 @@ func placeBombAtRandom(game *game) {
 	}
 }
 
+// Given a cell N, increments the value of
+// all nearby cells by 1
 func incrementNeighbors(game *game, cell uint) {
 	for _, cell := range cellNeighbors(game, cell) {
 		if game.board[cell] != bomb {
@@ -58,8 +65,36 @@ func incrementNeighbors(game *game, cell uint) {
 	}
 }
 
+// Represents an offset from a given cell, positive and negative
+type offset struct {
+	rows int
+	cols int
+}
+
+// Offsets for neighbors of a given cell (cell itself would be {0, 0})
+var neighborOffsets = []offset{
+	{-1, -1}, {-1, +0}, {-1, +1},
+	{+0, -1} /* ... */, {+0, +1},
+	{+1, -1}, {+1, +0}, {+1, +1},
+}
+
+// Given a cell position N, returns a slice containing
+// the locations of all neighboring cells.
+// Board edges are properly handled so that only valid
+// cell locations are returned, and nothing outside the
+// board is.
 func cellNeighbors(game *game, cell uint) []uint {
-	// TODO: find list of empty neighbors and return
-	// the list of cells
-	return make([]uint, 0)
+	neighbors := make([]uint, 0, 8) // 8 is max valid amount of neighbors
+	col := int(cell % game.width)
+	row := int(cell / game.width)
+
+	for _, offset := range neighborOffsets {
+		newRow := row + offset.rows
+		newCol := col + offset.cols
+		if 0 <= newCol && uint(newCol) < game.width && 0 <= newRow && uint(newRow) < game.height {
+			neighbors = append(neighbors, uint(newCol)+uint(newRow)*game.width)
+		}
+	}
+
+	return neighbors
 }
