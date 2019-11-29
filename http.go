@@ -15,13 +15,13 @@ var games = make(map[string]*game)
 type gameSettings struct {
 	Width  uint `json:"width"`
 	Height uint `json:"height"`
-	Bombs  uint `json:"bombs"`
+	Mines  uint `json:"mines"`
 }
 
 func gamesCollectionHandler(w http.ResponseWriter, r *http.Request) {
 	// TODO: validate content-type of request
-	// 9x9 with 10 bombs is the default
-	config := gameSettings{Width: 9, Height: 9, Bombs: 10}
+	// 9x9 with 10 mines is the default
+	config := gameSettings{Width: 9, Height: 9, Mines: 10}
 	decoder := json.NewDecoder(r.Body)
 	err := decoder.Decode(&config)
 
@@ -32,17 +32,15 @@ func gamesCollectionHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// TODO: limit board size
-	// check that the amount of bombs makes sense
+	// check that the amount of mines makes sense
 	// for the board size and is > 0
-	game := makeGame(config.Width, config.Height, config.Bombs)
+	game := makeGame(config.Width, config.Height, config.Mines)
 	gameID := makeGameID()
 	games[gameID] = game
 
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusCreated)
 	encoder := json.NewEncoder(w)
-	// TODO: all fields in game are private, either make
-	// the exportable ones public or define a new struct
 	encoder.Encode(game)
 }
 
@@ -67,8 +65,6 @@ func gameHandler(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusOK)
 		encoder := json.NewEncoder(w)
-		// TODO: all fields in game are private, either make
-		// the exportable ones public or define a new struct
 		encoder.Encode(game)
 	}
 }
