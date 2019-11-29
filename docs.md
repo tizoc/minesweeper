@@ -21,8 +21,18 @@ A json object with a single key `"gameID"`, containing the ID value of the creat
 
 ## GET /minesweeper/games/{game-id}
 
-**TODO**
+Output:
+
+A representation of the game state as described above it it exists. If not, a 404 reply is sent instead.
 
 ## POST /minesweeper/games/{game-id}/plays
 
-**TODO**
+Content-Type: application/json
+Input: a json object with the following fields:
+
+- `location`, a reference to one of the cells in the board (>= 0 integer)
+- `action`, one of `"flag"` (toggles a flag in the given location) or `"uncover"` (uncovers the given location)
+
+Output:
+
+An update representation of the game state as described above it it exists with reply code 201 (play created). If not, a 404 reply is sent instead.
