@@ -10,12 +10,12 @@ import (
 // Utility function for debugging purposes
 func showBoard(game *game) string {
 	var output strings.Builder
-	for row := 0; row < int(game.height); row++ {
-		for col := 0; col < int(game.width); col++ {
-			cell := row*int(game.height) + col
-			value := game.boardView[cell]
+	for row := 0; row < int(game.Height); row++ {
+		for col := 0; col < int(game.Width); col++ {
+			cell := row*int(game.Height) + col
+			value := game.BoardView[cell]
 			switch value {
-			case bomb:
+			case mine:
 				output.WriteString(" * ")
 			case covered:
 				output.WriteString(" - ")
@@ -91,7 +91,7 @@ func Test_uncover(t *testing.T) {
 	t.Run("uncover() cascading on 0-value cell", func(t *testing.T) {
 		game := makeGame(4, 4, 1)
 		copy(game.board, emptyboard)
-		placeBombAt(game, 6)
+		placeMineAt(game, 6)
 		uncover(game, 0)
 		c := int8(covered)
 		expected := boardCells{
@@ -100,9 +100,9 @@ func Test_uncover(t *testing.T) {
 			0, 1, 1, 1,
 			0, 0, 0, 0,
 		}
-		if !reflect.DeepEqual(expected, game.boardView) {
+		if !reflect.DeepEqual(expected, game.BoardView) {
 			gameTmp := makeGame(4, 4, 1)
-			gameTmp.boardView = expected
+			gameTmp.BoardView = expected
 			t.Errorf("uncover() did not cascade as expected, wanted:\n%s\n got:\n%s\n", showBoard(gameTmp), showBoard(game))
 		}
 	})
@@ -110,7 +110,7 @@ func Test_uncover(t *testing.T) {
 	t.Run("uncover() not cascading on non 0-value cell", func(t *testing.T) {
 		game := makeGame(4, 4, 1)
 		copy(game.board, emptyboard)
-		placeBombAt(game, 6)
+		placeMineAt(game, 6)
 		uncover(game, 2)
 		c := int8(covered)
 		expected := boardCells{
@@ -119,9 +119,9 @@ func Test_uncover(t *testing.T) {
 			c, c, c, c,
 			c, c, c, c,
 		}
-		if !reflect.DeepEqual(expected, game.boardView) {
+		if !reflect.DeepEqual(expected, game.BoardView) {
 			gameTmp := makeGame(4, 4, 1)
-			gameTmp.boardView = expected
+			gameTmp.BoardView = expected
 			t.Errorf("uncover() did cascade when it should had not, wanted:\n%s\n got:\n%s\n", showBoard(gameTmp), showBoard(game))
 		}
 	})

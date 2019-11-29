@@ -9,63 +9,63 @@ type boardCells []int8
 // Cell values
 // N from 0 to 8 represents the amount of nearby mines
 const (
-	bomb    = -1
+	mine    = -1
 	flagged = -126
 	covered = -127
 )
 
 type game struct {
-	board     boardCells // Underlying board with bombs and numbers placed
-	boardView boardCells // Board as shown to the user (includes flags and covered cells)
-	height    uint
-	width     uint
-	bombs     uint
+	board     boardCells // Underlying board with mines and numbers placed
+	BoardView boardCells `json:"board"` // Board as shown to the user (includes flags and covered cells)
+	Height    uint       `json:"height"`
+	Width     uint       `json:"width"`
+	Mines     uint       `json:"mines"`
 }
 
-func makeGame(width, height, bombs uint) *game {
+func makeGame(width, height, mines uint) *game {
 	game := &game{
-		width:     width,
-		height:    height,
+		Width:     width,
+		Height:    height,
 		board:     make([]int8, height*width),
-		boardView: make([]int8, height*width),
-		bombs:     bombs,
+		BoardView: make([]int8, height*width),
+		Mines:     mines,
 	}
-	placeBombs(game)
+	placeMines(game)
 	coverBoard(game)
 	return game
 }
 
 func coverBoard(game *game) {
-	for i := range game.boardView {
-		game.boardView[i] = covered
+	for i := range game.BoardView {
+		game.BoardView[i] = covered
 	}
 }
 
-func placeBombs(game *game) {
-	for i := uint(0); i < game.bombs; i++ {
-		placeBombAtRandom(game)
+func placeMines(game *game) {
+	for i := uint(0); i < game.Mines; i++ {
+		placeMineAtRandom(game)
 	}
 }
 
 // Finds an empty cell in the game board
-// and places a bomb on it
-func placeBombAtRandom(game *game) {
-	cellsCount := int(game.width * game.height)
+// and places a mine on it
+func placeMineAtRandom(game *game) {
+	cellsCount := int(game.Width * game.Height)
 	for {
 		cell := uint(rand.Intn(cellsCount))
-		if placeBombAt(game, cell) {
+		if placeMineAt(game, cell) {
 			return
 		}
 	}
 }
 
-// Places a bomb at cell.
+// Places a mine at cell.
 // Returns true if succesful, otherwise false
-func placeBombAt(game *game, cell uint) bool {
-	if game.board[cell] == bomb {
+func placeMineAt(game *game, cell uint) bool {
+	if game.board[cell] == mine {
 		return false
 	}
-	game.board[cell] = bomb
+	game.board[cell] = mine
 	incrementNeighbors(game, cell)
 	return true
 
@@ -75,7 +75,7 @@ func placeBombAt(game *game, cell uint) bool {
 // all nearby cells by 1
 func incrementNeighbors(game *game, cell uint) {
 	for _, cell := range cellNeighbors(game, cell) {
-		if game.board[cell] != bomb {
+		if game.board[cell] != mine {
 			game.board[cell]++
 		}
 	}
@@ -101,14 +101,14 @@ var neighborOffsets = []offset{
 // board is.
 func cellNeighbors(game *game, cell uint) []uint {
 	neighbors := make([]uint, 0, 8) // 8 is max valid amount of neighbors
-	col := int(cell % game.width)
-	row := int(cell / game.width)
+	col := int(cell % game.Width)
+	row := int(cell / game.Width)
 
 	for _, offset := range neighborOffsets {
 		newRow := row + offset.rows
 		newCol := col + offset.cols
-		if 0 <= newCol && uint(newCol) < game.width && 0 <= newRow && uint(newRow) < game.height {
-			neighbors = append(neighbors, uint(newCol)+uint(newRow)*game.width)
+		if 0 <= newCol && uint(newCol) < game.Width && 0 <= newRow && uint(newRow) < game.Height {
+			neighbors = append(neighbors, uint(newCol)+uint(newRow)*game.Width)
 		}
 	}
 
@@ -119,7 +119,7 @@ func cellNeighbors(game *game, cell uint) []uint {
 // Return true if sucessful, false otherwise.
 // Fails when the cell is not covered.
 func toggleFlag(game *game, cell uint) bool {
-	cells := game.boardView
+	cells := game.BoardView
 	switch cells[cell] {
 	case flagged:
 		cells[cell] = covered
@@ -133,18 +133,18 @@ func toggleFlag(game *game, cell uint) bool {
 }
 
 // Uncovers a cell.
-// If the cell has no nearby bombs, uncovers
+// If the cell has no nearby mines, uncovers
 // al nearby cells too in cascade.
 // Return true if sucessful, false otherwise.
 // Fails when the cell is not covered or there
 // is a flag on it.
 func uncover(game *game, cell uint) bool {
-	if game.boardView[cell] != covered {
+	if game.BoardView[cell] != covered {
 		return false
 	}
 	cellValue := game.board[cell]
-	game.boardView[cell] = cellValue
-	if cellValue == 0 { // No bombs near, cascade
+	game.BoardView[cell] = cellValue
+	if cellValue == 0 { // No mines near, cascade
 		for _, otherCell := range cellNeighbors(game, cell) {
 			uncover(game, otherCell)
 		}
@@ -154,16 +154,16 @@ func uncover(game *game, cell uint) bool {
 }
 
 // Checks if the game is finished already
-// either by a bomb being uncovered
+// either by a mine being uncovered
 // or the game being won.
 func isGameFinished(game *game) bool {
 	// To win, player must uncover all cells
-	// that do not contain bombs
-	// If a bomb is uncovered, player loses
-	pendingCells := game.width*game.height - game.bombs
-	for _, cellValue := range game.boardView {
-		if cellValue == bomb {
-			return true // Bomb uncovered, game finished
+	// that do not contain mines
+	// If a mine is uncovered, player loses
+	pendingCells := game.Width*game.Height - game.Mines
+	for _, cellValue := range game.BoardView {
+		if cellValue == mine {
+			return true // Mine uncovered, game finished
 		}
 		pendingCells--
 	}
