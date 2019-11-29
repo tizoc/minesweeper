@@ -57,7 +57,20 @@ func makeGameID() string {
 }
 
 func gameHandler(w http.ResponseWriter, r *http.Request) {
-	// TODO
+	vars := mux.Vars(r)
+	gameID := vars["id"]
+	game, ok := games[gameID]
+
+	if !ok {
+		w.WriteHeader(http.StatusNotFound)
+	} else {
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusOK)
+		encoder := json.NewEncoder(w)
+		// TODO: all fields in game are private, either make
+		// the exportable ones public or define a new struct
+		encoder.Encode(game)
+	}
 }
 
 func gamePlayHandler(w http.ResponseWriter, r *http.Request) {
