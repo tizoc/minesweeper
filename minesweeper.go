@@ -160,6 +160,18 @@ func uncover(game *game, cell uint) bool {
 // either by a bomb being uncovered
 // or the game being won.
 func isGameFinished(game *game) bool {
-	// TODO
+	// To win, player must uncover all cells
+	// that do not contain bombs
+	// If a bomb is uncovered, player loses
+	pendingCells := game.width*game.height - game.bombs
+	for _, cellValue := range game.boardView {
+		if cellValue == bomb {
+			return true // Bomb uncovered, game finished
+		}
+		pendingCells--
+	}
+	if pendingCells == 0 {
+		return true // No pending cells to uncover, game finished
+	}
 	return false
 }
