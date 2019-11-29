@@ -41,7 +41,9 @@ func gamesCollectionHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusCreated)
 	encoder := json.NewEncoder(w)
-	encoder.Encode(game)
+	encoder.Encode(map[string]string{
+		"ID": gameID,
+	})
 }
 
 // Makes a random identifier string for games

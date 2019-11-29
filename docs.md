@@ -17,8 +17,7 @@ Input: a json object with the following fields:
 
 Output:
 
-A json object with the game state as described above and deply code 201.
-
+A json object with a single key `"gameID"`, containing the ID value of the created game. Reply code 201.
 
 ## GET /minesweeper/games/{game-id}
 
