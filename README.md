@@ -1,37 +1,33 @@
 # minesweeper-API
-API test
 
-We ask that you complete the following challenge to evaluate your development skills. Please use the programming language and framework discussed during your interview to accomplish the following task.
+To build:
 
-## The Game
-Develop the classic game of [Minesweeper](https://en.wikipedia.org/wiki/Minesweeper_(video_game))
+    make build
 
-## Show your work
+To run tests:
 
-1.  Create a Public repository ( please dont make a pull request, clone the private repository and create a new plublic one on your profile)
-2.  Commit each step of your process so we can follow your thought process.
+    make test:
 
-## What to build
-The following is a list of items (prioritized from most important to least important) we wish to see:
-* Design and implement  a documented RESTful API for the game (think of a mobile app for your API)
-* Implement an API client library for the API designed above. Ideally, in a different language, of your preference, to the one used for the API
-* When a cell with no adjacent mines is revealed, all adjacent squares will be revealed (and repeat)
-* Ability to 'flag' a cell with a question mark or red flag
-* Detect when game is over
-* Persistence
-* Time tracking
-* Ability to start a new game and preserve/resume the old ones
-* Ability to select the game parameters: number of rows, columns, and mines
-* Ability to support multiple users/accounts
- 
-## Deliverables we expect:
-* URL where the game can be accessed and played (use any platform of your preference: heroku.com, aws.amazon.com, etc)
-* Code in a public Github repo
-* README file with the decisions taken and important notes
+To run:
 
-## Time Spent
-You do not need to fully complete the challenge. We suggest not to spend more than 5 hours total, which can be done over the course of 2 days.  Please make commits as often as possible so we can see the time you spent and please do not make one commit.  We will evaluate the code and time spent.
- 
-What we want to see is how well you handle yourself given the time you spend on the problem, how you think, and how you prioritize when time is insufficient to solve everything.
+    make run
 
-Please email your solution as soon as you have completed the challenge or the time is up.
+## Notes
+
+### What is supported
+
+- Revealing a cell that does not contain nearby mines produces cascade reveal effect on nearby cells.
+- Covered cells can be flagged.
+- Time is tracked.
+- Detects game finish (either won or lost).
+- Multiple games supported.
+- Configurable board size and amount of mines.
+
+### What is pending
+
+- Example client.
+- This is basic-REST, no HATEOAS or even close.
+- Error responses don't contain enough information.
+- Some validation is missing when creating the game.
+- Not parallel-safe, a possible solution would be to communicate each game instance through a channel to enforce plays to be sequential.
+- No out-or-process persistence. Game state could be marshalled and stored in plain files, an external database user, or even the insterlal state encoded and encrypted and included as part of the HTTP replies to make everything stateless server-side (state representation is compact enough for this to be a viable option).
