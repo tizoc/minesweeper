@@ -30,4 +30,5 @@ To run:
 - Error responses don't contain enough information.
 - Some validation is missing when creating the game.
 - Not parallel-safe, a possible solution would be to communicate each game instance through a channel to enforce plays to be sequential.
+- Not memory-safe, the map that stores games is never cleaned up.
 - No out-or-process persistence. Game state could be marshalled and stored in plain files, an external database user, or even the insterlal state encoded and encrypted and included as part of the HTTP replies to make everything stateless server-side (state representation is compact enough for this to be a viable option).
