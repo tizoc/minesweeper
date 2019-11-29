@@ -7,7 +7,7 @@ minesweeper: $(FILES)
 	go build
 
 run: $(FILES)
-	go run $^
+	env PORT=8080 go run $^
 
 .PHONY: test
 test:

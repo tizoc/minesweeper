@@ -4,6 +4,7 @@ import (
 	"crypto/sha1"
 	"encoding/base64"
 	"encoding/json"
+	"fmt"
 	"github.com/gorilla/mux"
 	"log"
 	"math/rand"
@@ -132,11 +133,12 @@ func gamePlayHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func serveMineSweeper() {
+func serveMineSweeper(port string) {
+	address := fmt.Sprintf("0.0.0.0:%s", port)
 	router := mux.NewRouter()
 	router.HandleFunc("/minesweeper/games", gamesCollectionHandler).Methods("POST")
 	router.HandleFunc("/minesweeper/games/{id}", gameHandler).Methods("GET")
 	router.HandleFunc("/minesweeper/games/{id}/plays", gamePlayHandler).Methods("POST")
-	log.Print("Starting server on port 8080")
-	log.Fatal(http.ListenAndServe("0.0.0.0:8080", router))
+	log.Printf("Starting server on port %s", port)
+	log.Fatal(http.ListenAndServe(address, router))
 }
