@@ -1,9 +1,12 @@
 package main
 
 import (
+	"crypto/sha1"
+	"encoding/base64"
 	"encoding/json"
 	"github.com/gorilla/mux"
 	"log"
+	"math/rand"
 	"net/http"
 )
 
@@ -43,8 +46,14 @@ func gamesCollectionHandler(w http.ResponseWriter, r *http.Request) {
 	encoder.Encode(game)
 }
 
+// Makes a random identifier string for games
+// Doesn't check for collisions
 func makeGameID() string {
-	return "TODO"
+	hasher := sha1.New()
+	randomBytes := make([]byte, 4)
+	rand.Read(randomBytes)
+	hash := hasher.Sum(randomBytes)
+	return base64.URLEncoding.EncodeToString(hash)
 }
 
 func gameHandler(w http.ResponseWriter, r *http.Request) {
