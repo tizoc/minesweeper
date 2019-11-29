@@ -71,8 +71,55 @@ func gameHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+type play struct {
+	Action   string `json:"action"`
+	Location uint   `json:"location"`
+}
+
 func gamePlayHandler(w http.ResponseWriter, r *http.Request) {
-	// TODO
+	// TODO: validate content-type of request
+	// TODO: verify that game has not been finished already
+	vars := mux.Vars(r)
+	gameID := vars["id"]
+	game, ok := games[gameID]
+
+	if !ok {
+		w.WriteHeader(http.StatusNotFound)
+	} else {
+		play := play{}
+		decoder := json.NewDecoder(r.Body)
+		err := decoder.Decode(&play)
+
+		if err != nil {
+			// TODO: add error message
+			w.WriteHeader(http.StatusBadRequest)
+			return
+		}
+
+		if play.Location >= uint(len(game.BoardView)) {
+			// TODO: add error message
+			w.WriteHeader(http.StatusBadRequest)
+			return
+		}
+
+		switch play.Action {
+		case "flag":
+			// TODO: notify if flagging not valid or ignore?
+			toggleFlag(game, play.Location)
+		case "uncover":
+			// TODO: notify if already uncovered or ignore?
+			uncover(game, play.Location)
+		default:
+			// TODO: add error message
+			w.WriteHeader(http.StatusBadRequest)
+			return
+		}
+
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusCreated)
+		encoder := json.NewEncoder(w)
+		encoder.Encode(game)
+	}
 }
 
 func serveMineSweeper() {
