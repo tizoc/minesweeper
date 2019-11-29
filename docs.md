@@ -11,9 +11,9 @@
 Content-Type: application/json
 Input: a json object with the following fields:
 
-- height, an integer > 0 that defines the height of the board (defaults to 9 if not provided)
-- width, an integer > 0 that defines the width of the board (defaults to 9 if not provided)
-- bombs, an integer > 0 that defines the amount of bombs to be placed (defaults to 10 if not provided)
+- `height`, an integer > 0 that defines the height of the board (defaults to 9 if not provided)
+- `width`, an integer > 0 that defines the width of the board (defaults to 9 if not provided)
+- `bombs`, an integer > 0 that defines the amount of bombs to be placed (defaults to 10 if not provided)
 
 Output:
 
