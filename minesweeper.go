@@ -34,7 +34,14 @@ func makeGame(width, height, bombs uint) *game {
 		bombs:     bombs,
 	}
 	placeBombs(game)
+	coverBoard(game)
 	return game
+}
+
+func coverBoard(game *game) {
+	for i := range game.boardView {
+		game.boardView[i] = covered
+	}
 }
 
 func placeBombs(game *game) {
@@ -49,12 +56,22 @@ func placeBombAtRandom(game *game) {
 	cellsCount := int(game.width * game.height)
 	for {
 		cell := uint(rand.Intn(cellsCount))
-		if game.board[cell] != bomb {
-			game.board[cell] = bomb
-			incrementNeighbors(game, cell)
+		if placeBombAt(game, cell) {
 			return
 		}
 	}
+}
+
+// Places a bomb at cell.
+// Returns true if succesful, otherwise false
+func placeBombAt(game *game, cell uint) bool {
+	if game.board[cell] == bomb {
+		return false
+	}
+	game.board[cell] = bomb
+	incrementNeighbors(game, cell)
+	return true
+
 }
 
 // Given a cell N, increments the value of
@@ -122,10 +139,21 @@ func toggleFlag(game *game, cell uint) bool {
 // If the cell has no nearby bombs, uncovers
 // al nearby cells too in cascade.
 // Return true if sucessful, false otherwise.
-// Fails when the cell is not covered.
+// Fails when the cell is not covered or there
+// is a flag on it.
 func uncover(game *game, cell uint) bool {
-	// TODO
-	return false
+	if game.boardView[cell] != covered {
+		return false
+	}
+	cellValue := game.board[cell]
+	game.boardView[cell] = cellValue
+	if cellValue == 0 { // No bombs near, cascade
+		for _, otherCell := range cellNeighbors(game, cell) {
+			uncover(game, otherCell)
+		}
+	}
+
+	return true
 }
 
 // Checks if the game is finished already
