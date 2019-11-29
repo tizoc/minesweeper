@@ -1,13 +1,50 @@
 package main
 
 import (
+	"encoding/json"
 	"github.com/gorilla/mux"
 	"log"
 	"net/http"
 )
 
+var games = make(map[string]*game)
+
+type gameSettings struct {
+	Width  uint `json:"width"`
+	Height uint `json:"height"`
+	Bombs  uint `json:"bombs"`
+}
+
 func gamesCollectionHandler(w http.ResponseWriter, r *http.Request) {
-	// TODO
+	// TODO: validate content-type of request
+	// 9x9 with 10 bombs is the default
+	config := gameSettings{Width: 9, Height: 9, Bombs: 10}
+	decoder := json.NewDecoder(r.Body)
+	err := decoder.Decode(&config)
+
+	if err != nil {
+		// TODO: add error message
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
+	// TODO: limit board size
+	// check that the amount of bombs makes sense
+	// for the board size and is > 0
+	game := makeGame(config.Width, config.Height, config.Bombs)
+	gameID := makeGameID()
+	games[gameID] = game
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusCreated)
+	encoder := json.NewEncoder(w)
+	// TODO: all fields in game are private, either make
+	// the exportable ones public or define a new struct
+	encoder.Encode(game)
+}
+
+func makeGameID() string {
+	return "TODO"
 }
 
 func gameHandler(w http.ResponseWriter, r *http.Request) {

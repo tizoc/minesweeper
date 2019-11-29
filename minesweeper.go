@@ -23,9 +23,6 @@ type game struct {
 }
 
 func makeGame(width, height, bombs uint) *game {
-	// TODO: limit board size
-	// check that the amount of bombs makes sense
-	// for the board size and is > 0
 	game := &game{
 		width:     width,
 		height:    height,
