@@ -15,10 +15,11 @@ const (
 )
 
 type game struct {
-	board  boardCells
-	height uint
-	width  uint
-	bombs  uint
+	board     boardCells // Underlying board with bombs and numbers placed
+	boardView boardCells // Board as shown to the user (includes flags and covered cells)
+	height    uint
+	width     uint
+	bombs     uint
 }
 
 func makeGame(width, height, bombs uint) *game {
@@ -26,10 +27,11 @@ func makeGame(width, height, bombs uint) *game {
 	// check that the amount of bombs makes sense
 	// for the board size and is > 0
 	game := &game{
-		width:  width,
-		height: height,
-		board:  make([]int8, height*width),
-		bombs:  bombs,
+		width:     width,
+		height:    height,
+		board:     make([]int8, height*width),
+		boardView: make([]int8, height*width),
+		bombs:     bombs,
 	}
 	placeBombs(game)
 	return game
