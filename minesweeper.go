@@ -98,3 +98,29 @@ func cellNeighbors(game *game, cell uint) []uint {
 
 	return neighbors
 }
+
+// Toggle cell flag.
+// Return true if sucessful, false otherwise.
+// Fails when the cell is not covered.
+func toggleFlag(game *game, cell uint) bool {
+	// TODO
+	return true
+}
+
+// Uncovers a cell.
+// If the cell has no nearby bombs, uncovers
+// al nearby cells too in cascade.
+// Return true if sucessful, false otherwise.
+// Fails when the cell is not covered.
+func uncover(game *game, cell uint) bool {
+	// TODO
+	return false
+}
+
+// Checks if the game is finished already
+// either by a bomb being uncovered
+// or the game being won.
+func isGameFinished(game *game) bool {
+	// TODO
+	return false
+}
