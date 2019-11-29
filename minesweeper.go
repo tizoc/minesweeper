@@ -2,6 +2,7 @@ package main
 
 import (
 	"math/rand"
+	"time"
 )
 
 type boardCells []int8
@@ -14,12 +15,22 @@ const (
 	covered = -127
 )
 
+const (
+	notStartedStatus = "NotStarted"
+	startedStatus    = "Started"
+	lostStatus       = "Lost"
+	wonStatus        = "Won"
+)
+
 type game struct {
 	board     boardCells // Underlying board with mines and numbers placed
 	BoardView boardCells `json:"board"` // Board as shown to the user (includes flags and covered cells)
 	Height    uint       `json:"height"`
 	Width     uint       `json:"width"`
 	Mines     uint       `json:"mines"`
+	StartedAt time.Time  `json:"startedAt"`
+	EndedAt   time.Time  `json:"endedAt"`
+	Status    string     `json:"status"`
 }
 
 func makeGame(width, height, mines uint) *game {
@@ -29,10 +40,16 @@ func makeGame(width, height, mines uint) *game {
 		board:     make([]int8, height*width),
 		BoardView: make([]int8, height*width),
 		Mines:     mines,
+		Status:    notStartedStatus,
 	}
 	placeMines(game)
 	coverBoard(game)
 	return game
+}
+
+func startGame(game *game) {
+	game.StartedAt = time.Now().UTC()
+	game.Status = startedStatus
 }
 
 func coverBoard(game *game) {
@@ -156,18 +173,22 @@ func uncover(game *game, cell uint) bool {
 // Checks if the game is finished already
 // either by a mine being uncovered
 // or the game being won.
-func isGameFinished(game *game) bool {
+func checkGameFinished(game *game) bool {
 	// To win, player must uncover all cells
 	// that do not contain mines
 	// If a mine is uncovered, player loses
 	pendingCells := game.Width*game.Height - game.Mines
 	for _, cellValue := range game.BoardView {
 		if cellValue == mine {
+			game.Status = lostStatus
+			game.EndedAt = time.Now().UTC()
 			return true // Mine uncovered, game finished
 		}
 		pendingCells--
 	}
 	if pendingCells == 0 {
+		game.Status = wonStatus
+		game.EndedAt = time.Now().UTC()
 		return true // No pending cells to uncover, game finished
 	}
 	return false

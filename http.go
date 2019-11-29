@@ -78,13 +78,17 @@ type play struct {
 
 func gamePlayHandler(w http.ResponseWriter, r *http.Request) {
 	// TODO: validate content-type of request
-	// TODO: verify that game has not been finished already
 	vars := mux.Vars(r)
 	gameID := vars["id"]
 	game, ok := games[gameID]
 
 	if !ok {
 		w.WriteHeader(http.StatusNotFound)
+	} else if game.Status == wonStatus || game.Status == lostStatus {
+		// Game already finished, plays are not valid
+		// TODO: add error message
+		w.WriteHeader(http.StatusBadRequest)
+		return
 	} else {
 		play := play{}
 		decoder := json.NewDecoder(r.Body)
@@ -114,6 +118,12 @@ func gamePlayHandler(w http.ResponseWriter, r *http.Request) {
 			w.WriteHeader(http.StatusBadRequest)
 			return
 		}
+
+		if game.Status == notStartedStatus {
+			startGame(game)
+		}
+
+		checkGameFinished(game)
 
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusCreated)
