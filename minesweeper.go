@@ -1,5 +1,9 @@
 package main
 
+import (
+	"math/rand"
+)
+
 type boardCells []int8
 
 // Cell values
@@ -35,14 +39,27 @@ func placeBombs(game *game) {
 }
 
 func placeBombAtRandom(game *game) {
-	// TODO
-	// - find random cell without a bomb
-	// - place bomb at cell
-	// - increment nearby-mines count for all neighbor cells without bombs
+	cellsCount := game.width * game.height
+	for {
+		cell := uint(rand.Intn(int(cellsCount)))
+		if game.board[cell] != bomb {
+			game.board[cell] = bomb
+			incrementNeighbors(game, cell)
+			return
+		}
+	}
 }
 
 func incrementNeighbors(game *game, cell uint) {
-	// TODO
-	// - Find neighbors without bombs
-	// - Increase value by 1 on each
+	for _, cell := range cellNeighbors(game, cell) {
+		if game.board[cell] != bomb {
+			game.board[cell]++
+		}
+	}
+}
+
+func cellNeighbors(game *game, cell uint) []uint {
+	// TODO: find list of empty neighbors and return
+	// the list of cells
+	return make([]uint, 0)
 }
