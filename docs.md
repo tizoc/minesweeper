@@ -2,7 +2,33 @@
 
 ## Game state representation
 
-**TODO**: document state object retuned by all the endpoints defined below
+The game state is represented by a json object with the following fields:
+
+- `board` is an array of integers representing each cell in the board. Values >= 0 are for uncovered cells, and the value represents the amount of nearby mines. A value of -1 represents a bomb, a value of -127 represents a covered cell and a value of -126 represents a flag.
+- `height` is the height of the board.
+- `width` is the width of the board.
+- `mines` is the total amount of mines in the board.
+- `status` is one of `"NotStarted"`, `"Started"`, `"Won"` or `"Lost`".
+- `startedAt` is the time at which the game started.
+- `endedAt` is the time at which the game was won or lost.
+
+The size of `board` is equal to `height * width`.
+
+Example:
+
+```json
+{
+    "board": [
+        0, 0, 1, -1, 1, 0, /* .... */ -127
+    ],
+    "height": 9,
+    "width": 9,
+    "mines": 10,
+    "status": "Lost",
+    "startedAt": "2019-11-29T21:59:43.020639Z",
+    "endedAt": "2019-11-29T21:59:56.694715Z"
+}
+```
 
 ## Endpoints
 
