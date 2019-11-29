@@ -105,8 +105,17 @@ func cellNeighbors(game *game, cell uint) []uint {
 // Return true if sucessful, false otherwise.
 // Fails when the cell is not covered.
 func toggleFlag(game *game, cell uint) bool {
-	// TODO
-	return true
+	cells := game.boardView
+	switch cells[cell] {
+	case flagged:
+		cells[cell] = covered
+		return true
+	case covered:
+		cells[cell] = flagged
+		return true
+	default:
+		return false
+	}
 }
 
 // Uncovers a cell.
