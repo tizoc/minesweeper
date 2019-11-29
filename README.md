@@ -1,5 +1,9 @@
 # minesweeper-API
 
+To install dependencies:
+
+    dep ensure
+
 To build:
 
     make build
